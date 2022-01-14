@@ -1,0 +1,13 @@
+dataset: cifar10
+templates:
+  72174a75-8407-48e5-91e7-94ba603f49f7: !Template
+    answer_choices: Airplane ||| Automobile ||| Bird ||| Cat ||| Deer ||| Dog |||
+      Frog ||| Horse ||| Ship ||| Truck
+    id: 72174a75-8407-48e5-91e7-94ba603f49f7
+    jinja: '{{img}} Could you recognize the object present in this image? ||| {{answer_choices[label]}}'
+    metadata: !TemplateMetadata
+      choices_in_prompt: false
+      metrics: []
+      original_task: false
+    name: test
+    reference: ''

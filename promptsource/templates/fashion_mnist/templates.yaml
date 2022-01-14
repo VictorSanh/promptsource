@@ -1,0 +1,13 @@
+dataset: fashion_mnist
+templates:
+  f5a3d54f-9a6d-45de-a388-f554a759e86e: !Template
+    answer_choices: T - shirt ||| Trouser ||| Pullover ||| Dress ||| Coat ||| Sandal
+      ||| Shirt ||| Sneaker ||| Bag ||| Ankle boot
+    id: f5a3d54f-9a6d-45de-a388-f554a759e86e
+    jinja: this is what? {{image}} ||| {{answer_choices[label]}}
+    metadata: !TemplateMetadata
+      choices_in_prompt: false
+      metrics: []
+      original_task: false
+    name: test
+    reference: ''

@@ -1,0 +1,22 @@
+dataset: cifar100
+templates:
+  68c145be-b8a7-4c37-8573-73519dda7477: !Template
+    answer_choices: Aquatic mammals ||| Fish ||| Flowers ||| Food containers ||| Fruit
+      and vegetables ||| Household electrical devices ||| household furniture |||
+      Insects ||| Large carnivores ||| Large man made outdor things ||| large natural
+      outdoor scnes ||| Large omnivores ||| medium animals ||| non ||| people |||
+      reptiles ||| smal anima s||| tress ||| veh ||| veh
+    id: 68c145be-b8a7-4c37-8573-73519dda7477
+    jinja: '{{img}} What is this? Choose between:
+
+      - {{answer_choices | join("\n-")}}
+
+      |||
+
+      {{answer_choices[coarse_label]}}'
+    metadata: !TemplateMetadata
+      choices_in_prompt: false
+      metrics: []
+      original_task: false
+    name: test
+    reference: ''

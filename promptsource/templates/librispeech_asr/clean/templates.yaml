@@ -1,0 +1,13 @@
+dataset: librispeech_asr
+subset: clean
+templates:
+  7591fa60-ba2d-4e16-a034-f4aee3960a8c: !Template
+    answer_choices: null
+    id: 7591fa60-ba2d-4e16-a034-f4aee3960a8c
+    jinja: What is it saying? {{audio}} ||| {{text}}
+    metadata: !TemplateMetadata
+      choices_in_prompt: false
+      metrics: []
+      original_task: false
+    name: test
+    reference: ''
