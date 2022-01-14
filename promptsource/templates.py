@@ -173,9 +173,7 @@ class Template(yaml.YAMLObject):
             if var not in example:
                 raise NameError(f"Field `{var}` does not exist in example.")
         special_variables = {
-            k: example[k]
-            for k in variables
-            if k != "answer_choices" and not isinstance(example[k], (str, int, float))
+            k: example[k] for k in variables if k != "answer_choices" and not isinstance(example[k], (str, int, float))
         }
 
         # Replace the non-string variables in the jinja

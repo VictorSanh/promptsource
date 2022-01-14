@@ -1,7 +1,7 @@
 import argparse
+import re
 import textwrap
 from multiprocessing import Manager, Pool
-import re
 
 import pandas as pd
 import plotly.express as px
@@ -12,6 +12,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import DjangoLexer
 from templates import INCLUDED_USERS
 
+from promptsource.rendering_utils import st_render
 from promptsource.session import _get_state
 from promptsource.templates import DatasetTemplates, Template, TemplateCollection
 from promptsource.utils import (
@@ -22,7 +23,6 @@ from promptsource.utils import (
     renameDatasetColumn,
     render_features,
 )
-from promptsource.rendering_utils import st_render
 
 
 # add an argument for read-only
@@ -611,14 +611,14 @@ else:
                         st_render(
                             input_sequence=prompt[0],
                             special_variables=special_variables,
-                            dataset_schema=dataset.features
+                            dataset_schema=dataset.features,
                         )
                         if len(prompt) > 1:
                             st.write("Target")
                             st_render(
                                 input_sequence=prompt[1],
                                 special_variables=special_variables,
-                                dataset_schema=dataset.features
+                                dataset_schema=dataset.features,
                             )
 
 
