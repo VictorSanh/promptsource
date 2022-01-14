@@ -134,26 +134,26 @@ class Template(yaml.YAMLObject):
         rendered_choices = rtemplate.render(**protected_example)
         return [self._unescape_pipe(answer_choice.strip()) for answer_choice in rendered_choices.split("|||")]
 
-    def get_fixed_answer_choices_list(self):
-        """
-        Returns a list of answer choices that is static across examples, if possible
+    # def get_fixed_answer_choices_list(self):
+    #     """
+    #     Returns a list of answer choices that is static across examples, if possible
 
-        :return: list of strings, or None if no static list exists
-        """
-        jinja = self.get_answer_choices_expr()
-        if jinja is None:
-            return None
+    #     :return: list of strings, or None if no static list exists
+    #     """
+    #     jinja = self.get_answer_choices_expr()
+    #     if jinja is None:
+    #         return None
 
-        parse = env.parse(jinja)
-        variables = meta.find_undeclared_variables(parse)
-        if len(variables) == 0:
-            rtemplate = env.from_string(jinja)
-            rendered_choices = rtemplate.render()
-            return [answer_choice.strip() for answer_choice in rendered_choices.split("|||")]
-        else:
-            return None
+    #     parse = env.parse(jinja)
+    #     variables = meta.find_undeclared_variables(parse)
+    #     if len(variables) == 0:
+    #         rtemplate = env.from_string(jinja)
+    #         rendered_choices = rtemplate.render()
+    #         return [answer_choice.strip() for answer_choice in rendered_choices.split("|||")]
+    #     else:
+    #         return None
 
-    def apply(self, example, truncate=True, highlight_variables=False):
+    def apply(self, example, truncate=False, highlight_variables=False):
         """
         Creates a prompt by applying this template to an example
 
@@ -164,12 +164,31 @@ class Template(yaml.YAMLObject):
         """
         jinja = self.jinja
 
-        # Truncates the prompt if needed
-        if truncate:
-            trunc_command = (
-                f" | string | truncate({TEXT_VAR_LENGTH}) }}}}"  # Escaping curly braces requires doubling them
-            )
-            jinja = jinja.replace("}}", trunc_command)
+        # Get the special variables (i.e. not string/int/float)
+        ast_parse = env.parse(jinja)
+        variables = meta.find_undeclared_variables(ast_parse)
+        for var in variables:
+            if var == "answer_choices":
+                continue
+            if var not in example:
+                raise NameError(f"Field `{var}` does not exist in example.")
+        special_variables = {
+            k: example[k]
+            for k in variables
+            if k != "answer_choices" and not isinstance(example[k], (str, int, float))
+        }
+
+        # Replace the non-string variables in the jinja
+        # TODO: assumption here is that non string variables don't have additional filters
+        for special_var in special_variables.keys():
+            jinja = jinja.replace(f"{{{{{special_var}}}}}", f"<<{special_var}>>")
+
+        # # Truncates the prompt if needed
+        # if truncate:
+        #     trunc_command = (
+        #         f" | string | truncate({TEXT_VAR_LENGTH}) }}}}"  # Escaping curly braces requires doubling them
+        #     )
+        #     jinja = jinja.replace("}}", trunc_command)
 
         # Highlights text that was substituted for variables, if requested
         if highlight_variables:
@@ -189,7 +208,7 @@ class Template(yaml.YAMLObject):
 
         # Splits on the separator, and then replaces back any occurrences of the
         # separator in the original example
-        return [self._unescape_pipe(part).strip() for part in rendered_example.split("|||")]
+        return [self._unescape_pipe(part).strip() for part in rendered_example.split("|||")], special_variables
 
     pipe_protector = "3ed2dface8203c4c9dfb1a5dc58e41e0"
 

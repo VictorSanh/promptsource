@@ -1,6 +1,7 @@
 import argparse
 import textwrap
 from multiprocessing import Manager, Pool
+import re
 
 import pandas as pd
 import plotly.express as px
@@ -21,6 +22,7 @@ from promptsource.utils import (
     renameDatasetColumn,
     render_features,
 )
+from promptsource.rendering_utils import st_render
 
 
 # add an argument for read-only
@@ -599,15 +601,26 @@ else:
                 if state.template_name is not None:
                     st.empty()
                     template = dataset_templates[state.template_name]
-                    prompt = template.apply(example)
-                    if prompt == [""]:
+                    prompt, special_variables = template.apply(example)
+                    if prompt == [""] and not special_variables:
                         st.write("∅∅∅ *Blank result*")
                     else:
                         st.write("Input")
-                        show_text(prompt[0], width=40)
+                        if special_variables:
+                            assert "<<" in prompt[0] and ">>" in prompt[0]
+                        st_render(
+                            input_sequence=prompt[0],
+                            special_variables=special_variables,
+                            dataset_schema=dataset.features
+                        )
                         if len(prompt) > 1:
                             st.write("Target")
-                            show_text(prompt[1], width=40)
+                            st_render(
+                                input_sequence=prompt[1],
+                                special_variables=special_variables,
+                                dataset_schema=dataset.features
+                            )
+
 
 #
 # Must sync state at end
